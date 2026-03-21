@@ -53,6 +53,7 @@ class NexusFeatures(BaseTransform):
     chi2 = ((times - t_weigh_avg)**2 / (sigmas**2 - s_weigh_avg).clamp(min=1e-6)).sum(dim=1).unsqueeze(1)
         
     # we concat along the existing dimension to [n_sp, sp_feats]
-    data['sp'].x = cat((data['sp'].pos, delta_T, delta_Q, chi2), dim=1) 
+    # data['sp'].x = cat((data['sp'].pos, delta_T, delta_Q, chi2), dim=1) 
+    data['sp'].x = cat((delta_T, delta_Q, chi2), dim=1) 
 
     return data
