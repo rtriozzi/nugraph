@@ -24,7 +24,7 @@ class NuGraph2(LightningModule):
     inference, and compute training metrics."""
     def __init__(self,
                  in_features: int = 4,
-                 sp_features: int = 2,
+                 sp_features: int = 6,
                  planar_features: int = 64,
                  nexus_features: int = 16,
                  planes: list[str] = ['u','v','y'],
@@ -252,7 +252,7 @@ class NuGraph2(LightningModule):
                            help='Number of message-passing iterations')
         model.add_argument('--in-feats', type=int, default=4,
                            help='Number of input node features')
-        model.add_argument('--sp-feats', type=int, default=2,
+        model.add_argument('--sp-feats', type=int, default=6,
                            help='Number of spacepoint node features')
         model.add_argument('--planar-feats', type=int, default=64,
                            help='Hidden dimensionality of planar convolutions')
