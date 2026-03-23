@@ -57,13 +57,17 @@ class NexusNet(nn.Module):
 
         self.num_classes = num_classes
 
-        # self.nexus_up = SimpleConv(node_dim=0)
-        self.up_proj = nn.Sequential(
-            ClassLinear(planar_features, planar_features, num_classes),
-            nn.Tanh(),
-            #ClassLinear(planar_features, planar_features, num_classes),
-            #nn.Tanh()
+        # experiment: idea is that I'd like to 'gate'
+        # the information about a plane if the information
+        # is ambiguous for that plane and hit (e.g., shadowing
+        # due to projection)
+        # this should help when the space points have an
+        # additional role with nexus input features...
+        self.up_gate = nn.Sequential(
+            ClassLinear(planar_features, 1, num_classes),
+            nn.Sigmoid()
         )
+        
         self.nexus_up = SimpleConv(node_dim=0)
 
         self.nexus_net = nn.Sequential(
@@ -94,7 +98,8 @@ class NexusNet(nn.Module):
         # project up to nexus space
         n = [None] * len(self.nexus_down)
         for i, p in enumerate(self.nexus_down):
-            n[i] = self.nexus_up(x=(self.up_proj(x[p]), nexus), edge_index=edge_index[p])
+            gate = self.up_gate(x[p])
+            n[i] = self.nexus_up(x=(x[p] * gate, nexus), edge_index=edge_index[p])
         
         # convolve in nexus space
         x['sp'] = self.ckpt(self.nexus_net, cat((cat(n, dim=-1), x['sp']), dim=2))
